@@ -1,5 +1,5 @@
 
-const endpoint = axios.create({baseURL: 'http://localhost:3000'});
+const endpoint = axios.create({baseURL: 'https://restaurant-api-1215.herokuapp.com'});
 
     endpoint.interceptors.request.use(config => {
         NProgress.start()
