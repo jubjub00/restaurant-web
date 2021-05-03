@@ -1,0 +1,219 @@
+<script>
+    if(!sessionStorage.user){
+        alert("Please login!!!")
+        window.location.href = './index.html'
+    }
+    var user = JSON.parse(sessionStorage.getItem('user'))
+   
+</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Payment</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">	
+	<link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
+	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="fonts/iconic/css/material-design-iconic-font.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
+	<link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/animsition/css/animsition.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">	
+	<link rel="stylesheet" type="text/css" href="vendor/daterangepicker/daterangepicker.css">
+	<link rel="stylesheet" type="text/css" href="css/util.css">
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" href="./node_modules/toastr/build/toastr.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" />
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://unpkg.com/nprogress@0.2.0/nprogress.css" rel="stylesheet" />
+    <script src="https://unpkg.com/nprogress@0.2.0/nprogress.js"></script>
+</head>
+<body>
+<div id="pay">
+    <nav class="navbar navbar-expand-lg navbar-dark " style="background-color: #2C75FE;">
+        <div class="container-fluid">
+            <div class="row" style="width: 100%;">
+                <div class="col-md-6">
+                    <a class="navbar-brand" href="#">จัดการร้านอาหาร</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link " aria-current="page" href="./home_admin.html">อาหาร</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="./payment.html">ชำระเงิน</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6" align="right">
+                    <button type="button" class="btn btn-danger btn-xs" @click="logout">ออกจากระบบ</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div style="background-image: url('images/bg.jfif');background-position: center;background-repeat: no-repeat;background-size: cover;">
+        <div class="container-login100">
+            <div class="container">
+                <div class="in-card">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="panel-title">
+                                <h3>ข้อมูลการสั่งอาหาร</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div v-for="item in searchItems" class="col-md-12 col-6 my-1">
+                            <div class="card h-100">
+                                <div class="card-body"  >
+                                    <h3 class="card-title">คุณ {{ item.user.member_name }} {{ item.user.member_lastname }}</h3>
+                                    <br>
+                                    <table class="table table-striped">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">ชื่ออาหาร</th>
+                                            <th scope="col">ราคา</th>
+                                            <th scope="col">จำนวน</th>
+                                            <th scope="col">รวม</th>
+                                            <th scope="col">หมายเหตุ</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr v-for="i in item.detail">
+                                            <td>{{ i.food_name }}</td>
+                                            <td>{{ i.food_price }}</td>
+                                            <td>{{ i.food_unit }}</td>
+                                            <td>{{ i.food_price * i.food_unit | toThaibath }}</td>
+                                            <td>{{ i.food_description }}</td>
+                                        </tr>
+        
+                                        </tbody>
+                                    </table>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="card-title">รวม {{ item.total }} บาท</h5>
+                                        </div>
+                                        <div class="col-md-6" align="right">
+                                            <input type="button" class="btn btn-success " @click="openCash(item.order_id)" value="ชำระเงิน">
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+	
+	<script src="https://code.iconify.design/1/1.0.7/iconify.min.js"></script>
+	<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
+	<script src="vendor/animsition/js/animsition.min.js"></script>
+	<script src="vendor/bootstrap/js/popper.js"></script>
+	<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+	<script src="vendor/select2/select2.min.js"></script>
+	<script src="vendor/daterangepicker/moment.min.js"></script>
+	<script src="vendor/daterangepicker/daterangepicker.js"></script>
+	<script src="vendor/countdowntime/countdowntime.js"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="./node_modules/toastr/build/toastr.min.js"></script>
+	<script src="js/main.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.2/firebase-storage.js"></script>
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyC-8X-hm2X7AztdfycQ3qfpjwZDwVYIq8U",
+            authDomain: "food-6e72d.firebaseapp.com",
+            projectId: "food-6e72d",
+            storageBucket: "food-6e72d.appspot.com",
+            messagingSenderId: "248724393038",
+            appId: "1:248724393038:web:77bca089e2f714ee2e871f"
+            }
+            firebase.initializeApp(firebaseConfig)
+            
+    </script>
+
+    <script>
+        var app = new Vue({
+            el:"#pay",
+            data:{
+				food_name:'',
+                food_price:'',
+                img:null,
+                imgPreview:null,
+				hiddenId:null,
+                actionButton:'add',
+                HeaderTitle:'เพิ่มข้อมูลอาหาร',
+                ev:null,
+                search:'',
+				items: []
+            },
+            methods:{
+				order_all(){
+					endpoint.get('/order')
+					.then( function (res) {
+						if(res.data.statusCode == 200){
+                            console.log(res.data.data)
+							app.items = res.data.data
+						}else{
+							toastr.error('เชื่อมต่ออาจมีปัญหา','เกิดข้อผิดพลาด',{timeOut: 3000})
+						}
+					}).catch(function (error) {
+						console.log(error)
+					})
+				},openCash(id){
+                    if (confirm("ยืนยันการชำระเงิน") == false)
+                        return
+                    app.items.forEach(x=>{
+                        if(x.order_id == id){
+                            endpoint.post('/order',{
+                                order_id : x.order_id,
+                                user : x.user,
+                                status : 'Paid',
+                                detail : x.detail,
+                                total : x.total
+                            })
+                            .then( function (res) {
+                                if(res.data.statusCode == 200){
+                                    app.order_all()
+                                }else{}
+                            }).catch(function (error) {
+                                console.log(error)
+                            })
+                        }
+                    }) 
+                },logout(){
+                   sessionStorage.clear()
+                   window.location.href = './index.html'
+               }
+            },
+			filters: {
+				toThaibath (value) {
+				return `฿ ${value.toLocaleString()}`
+				}
+			},
+			created(){
+				this.order_all()
+			},
+			computed:{
+				searchItems:function(){
+					return this.items.filter((status)=>{
+						return status.status.match('Not yet paid')
+					})
+				}
+			}
+        })
+    </script>
+</body>
+</html>

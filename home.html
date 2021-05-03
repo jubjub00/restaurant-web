@@ -1,0 +1,392 @@
+<script>
+    if(!sessionStorage.user){
+        alert("Please login!!!")
+        window.location.href = './index.html'
+    }
+	if(sessionStorage.admin){
+		window.location.href = './home_admin.html'
+	}
+    var user = JSON.parse(sessionStorage.getItem('user'))
+	
+</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Home</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">	
+	<link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
+	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="fonts/iconic/css/material-design-iconic-font.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
+	<link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/animsition/css/animsition.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">	
+	<link rel="stylesheet" type="text/css" href="vendor/daterangepicker/daterangepicker.css">
+	<link rel="stylesheet" type="text/css" href="css/util.css">
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<link href="./node_modules//toastr/build/toastr.css" rel="stylesheet"/>
+	<link rel="stylesheet" href="./node_modules/toastr/build/toastr.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" />
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/vue@latest/dist/vue.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://unpkg.com/nprogress@0.2.0/nprogress.css" rel="stylesheet" />
+    <script src="https://unpkg.com/nprogress@0.2.0/nprogress.js"></script>
+</head>
+<body>
+<div id="home">
+	<nav class="navbar navbar-expand-lg navbar-dark " style="background-color: #2C75FE;">
+		<div class="container-fluid">
+			<div class="row" style="width: 100%;">
+				<div class="col-md-6">
+					
+				</div>
+				<div class="col-md-6" align="right">
+					<button type="button" class="btn btn-danger btn-xs" @click="logout">ออกจากระบบ</button>
+				</div>
+			</div>
+		</div>
+	</nav>
+	<div style="background-image: url('images/bg.jfif');background-position: center;background-repeat: no-repeat;background-size: cover;">
+		<div class="container-login100">
+			<div class="container" >
+				<div class="in-card">
+					<div class="container-fluid">
+						<form class="d-flex">
+							<input class="form-control me-2" v-model="search" type="search" placeholder="ค้นหาชื่ออาหาร" aria-label="Search">
+							<button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#myCart" @click="openCart()"><i class="fas fa-shopping-cart"></i><span v-if="countCart != 0">{{ countCart }}</span></button>
+						</form>
+					</div>
+					<hr>
+					<br>
+					<div class="row">
+						<div v-for="item in searchItems" class="col-md-3 col-6 my-1">
+							<div class="card h-100">
+								<img :src="item.img" class="card-img-top" style="height: 200px;">
+								
+								<div class="card-body"  >
+									<h3 class="card-title">{{ item.food_name }}</h3>
+								</div>
+								<div class="card-foot" >
+									<div class="row">
+										<div class="col-sm-6" align="left">
+											<div style="padding-left: 20px;">
+												<h4><span class="badge badge-pill badge-info badge-secondary">{{ item.food_price | toThaibath }}</span></h4>
+											</div>
+										</div>
+										<div class="col-sm-6" align="right">
+											<div style="padding-right: 20px;">
+												<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#myModal" @click="openModal(item.food_name,item.food_price,item.food_id)"><i class="fas fa-plus-square"></i></button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal fade" id="myModal" tabindex="-1">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+									<div class="row" style="width: 100%;">
+										<div class="col-md-6"><h4 class="modal-title">{{ foodName }}</h4></div>
+										<div class="col-md-6" align="right">
+											<h5>{{ foodPrice | toThaibath }}
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</h5></div>
+									</div>
+							</div>
+							<div class="modal-body">
+								<div class="form-group">
+									<label for="food_desc">หมายเหตุ</label>
+									<input type="text" v-model="food_desc" placeholder="เช่น ไม่ใส่ขิง" class="form-control">
+								</div>
+							</div>
+								<br>
+								<div class="modal-footer">
+									<input type="hidden" v-model="hiddenId">
+									<div class="row" style="width: 100%;">
+										<div class="col-md-6" align="left">
+											<div class="input-group">
+													<button type="button" id="m" v-if="parseInt(unit) > 1" class="quantity-left-minus btn btn-danger btn-number"  @click="minus">
+														<i class="fas fa-minus-circle"></i>
+													</button>
+													<button type="button" id="m" v-else class="quantity-left-minus btn btn-danger btn-number"  @click="minus" disabled>
+														<i class="fas fa-minus-circle"></i>
+													</button>
+												<input type="number" class="form-control input-number" v-model="unit" min="1" v-on:keyup="unitChange">
+												<button type="button" class="quantity-right-plus btn btn-success btn-number" @click="plus">
+														<i class="fas fa-plus-circle"></i>
+													</button>
+											</div>
+											
+										</div>
+										<div class="col-md-6" align="right">
+											<input type="button"  @click="addCart" class="btn btn-success btn-xs" value="add to cart">
+										</div>
+									</div>
+								</div>
+							
+						</div>
+					</div>
+				</div>
+				<div class="modal fade" id="myCart" tabindex="-1">
+					<div class="modal-dialog modal-dialog-scrollable">
+						<div class="modal-content">
+							<div class="modal-header">
+									<div class="row" style="width: 100%;">
+										<div class="col-md-6"><h4 class="modal-title">ยืนยันคำสั่งซื้อ</h4></div>
+										<div class="col-md-6" align="right">
+											<h5>รวม {{ totalPrice | toThaibath }} บาท
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</h5></div>
+									</div>
+							</div>
+							<div class="modal-body">
+								<div class="modal-dialog" v-for="it in itData">
+									<div class="modal-content">
+										<div class="modal-header">
+											<div class="row" style="width: 100%;">
+												<div class="col-md-6"><h4 class="modal-title">{{ it.food_name }}</h4></div>
+												<div class="col-md-6" align="right">
+													<h5>{{ it.food_price }}</h5>
+												</div>
+											</div>
+										</div>
+									<div class="modal-body">
+										<label for="food_desc">หมายเหตุ</label>
+										<input type="text" v-model="it.food_description" placeholder="เช่น ไม่ใส่ขิง" class="form-control" disabled>
+										<div class="row" style="width: 100%;">
+											<div class="col-md-6" align="left">
+												จำนวน
+												<input class="form-control input-number" v-model="it.food_unit" disabled>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+							<br>
+							<div class="modal-footer">
+								<input type="hidden" v-model="hiddenId">
+								<div class="row" style="width: 100%;">
+									<div class="col-md-6" align="left"></div>
+									<div class="col-md-6" align="right">
+										<input type="button"  @click="confirmOrder" class="btn btn-success btn-xs" value="confirm">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>		
+	<script src="https://code.iconify.design/1/1.0.7/iconify.min.js"></script>
+	<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
+	<script src="vendor/animsition/js/animsition.min.js"></script>
+	<script src="vendor/bootstrap/js/popper.js"></script>
+	<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+	<script src="vendor/select2/select2.min.js"></script>
+	<script src="vendor/daterangepicker/moment.min.js"></script>
+	<script src="vendor/daterangepicker/daterangepicker.js"></script>
+	<script src="vendor/countdowntime/countdowntime.js"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="./node_modules/toastr/build/toastr.min.js"></script>
+	<script src="js/main.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script>
+        var app = new Vue({
+            el:"#home",
+            data:{
+				food_desc:'',
+				hiddenId:'',
+				search:'',
+				foodId:'',
+				foodName:'',
+				countCart:0,
+				unit:1,
+				foodPrice:0,
+				totalPrice:0,
+				itData:'',
+				items: []
+            },
+            methods:{
+				food_all(){
+					endpoint.get('/food-all')
+					.then( function (res) {
+						if(res.data.statusCode == 200){
+							app.items = res.data.data
+						}else{
+							toastr.error('เชื่อมต่ออาจมีปัญหา','เกิดข้อผิดพลาด',{timeOut: 3000})
+						}
+					}).catch(function (error) {
+						console.log(error);
+					})
+
+					var it = {}
+					if(!sessionStorage.cart){
+						this.countCart = 0
+					}else{
+						it = JSON.parse(sessionStorage.getItem('cart'))
+						this.countCart = it.data.length
+					}
+					
+				},
+				addCart(){
+					var it = {}
+					if(!sessionStorage.cart){
+						var tmp = {}
+						tmp.food_name = app.foodName
+						tmp.food_price = app.foodPrice
+						tmp.food_unit = app.unit
+						tmp.food_id = app.foodId
+						if(app.food_desc == '')
+							tmp.food_description = null
+						else
+							tmp.food_description = app.food_desc
+
+						it.data = [tmp]
+						
+					}else{
+						it = JSON.parse(sessionStorage.getItem('cart'))
+						
+						var not_found = true
+						it.data.forEach(x=>{
+							if(x.food_id == app.foodId){
+					
+								x.food_name = app.foodName
+								x.food_price = app.foodPrice
+								x.food_unit = app.unit
+								x.food_id = app.foodId
+								if(app.food_desc == '')
+									x.food_description = null
+								else
+									x.food_description = app.food_desc
+
+								not_found = false
+							}
+						})
+						if(not_found){
+							var tmp = {}
+							tmp.food_name = app.foodName
+							tmp.food_price = app.foodPrice
+							tmp.food_unit = app.unit
+							tmp.food_id = app.foodId
+							if(app.food_desc == '')
+								tmp.food_description = null
+							else
+								tmp.food_description = app.food_desc
+							it.data.push(tmp)
+						}
+					}
+					app.foodId = ''
+					app.foodName = ''
+					app.foodPrice = 0
+					app.unit = 1
+					app.food_desc = ''
+					app.countCart = it.data.length
+					sessionStorage.setItem('cart',JSON.stringify(it))
+					$('#myModal').modal('hide')
+				},openModal(food_name,food_price,food_id){
+					if(sessionStorage.cart){
+						var it = JSON.parse(sessionStorage.getItem('cart'))
+						var not_found = true
+						it.data.forEach(x=>{
+							if(x.food_id == food_id){
+								app.foodName = food_name
+								app.foodPrice = food_price
+								app.unit = x.food_unit
+								app.foodId = food_id
+								app.food_desc = x.food_description
+								not_found = false
+							}
+						})
+						if(not_found){
+							app.foodName = food_name
+							app.foodPrice = food_price
+							app.foodId = food_id
+						}
+					}else{
+						app.foodName = food_name
+						app.foodPrice = food_price
+						app.foodId = food_id
+					}
+				},minus(){
+					app.unit--
+					if(app.unit == 1)
+						document.getElementById("m").disabled = true;
+					
+				},plus(){
+					document.getElementById("m").disabled = false;
+					app.unit++
+				},unitChange(){
+					if(app.unit < 1 && app.unit.length >= 1)
+						app.unit = 1
+					
+				},openCart(){
+					if(sessionStorage.cart){
+						var it = JSON.parse(sessionStorage.getItem('cart'))
+						this.totalPrice = 0
+						it.data.forEach(x=>{
+							this.totalPrice += (x.food_price*x.food_unit)
+						})
+						this.itData = it.data
+					}
+					
+				},confirmOrder(){
+					endpoint.post('/order',{
+                        order_id : null,
+						user : user,
+						status : 'Not yet paid',
+						detail : this.itData,
+						total : this.totalPrice
+                    })
+                    .then( function (res) {
+						sessionStorage.removeItem('cart')
+						if(res.data.statusCode == 200){
+							app.food_all()
+						}else{}
+                    }).catch(function (error) {
+                        console.log(error)
+						sessionStorage.removeItem('cart')
+                    })
+					$('#myCart').modal('hide')
+				},logout(){
+                   sessionStorage.clear()
+				   window.location.href = './index.html'
+               	}
+            },
+			filters: {
+				toThaibath (value) {
+				return `฿ ${value.toLocaleString()}`
+				},
+				search(e){
+
+				}
+			},
+			created(){
+				this.food_all()
+			},
+			computed:{
+				searchItems:function(){
+					return this.items.filter((name)=>{
+						return name.food_name.match(app.search)
+					})
+				}
+			}
+        })
+    </script>
+
+</body>
+</html>

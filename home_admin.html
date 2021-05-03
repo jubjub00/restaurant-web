@@ -1,0 +1,331 @@
+<script>
+    if(!sessionStorage.user){
+        alert("Please login!!!")
+        window.location.href = './index.html'
+    }
+    if(!sessionStorage.admin){
+        alert("No access!!!")
+        window.location.href = './index.html'
+    }
+</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Home System</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">	
+	<link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
+	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="fonts/iconic/css/material-design-iconic-font.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
+	<link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/animsition/css/animsition.min.css">
+	<link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">	
+	<link rel="stylesheet" type="text/css" href="vendor/daterangepicker/daterangepicker.css">
+	<link rel="stylesheet" type="text/css" href="css/util.css">
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" href="./node_modules/toastr/build/toastr.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" />
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://unpkg.com/nprogress@0.2.0/nprogress.css" rel="stylesheet" />
+    <script src="https://unpkg.com/nprogress@0.2.0/nprogress.js"></script>
+</head>
+<body>
+<div id="home">
+    <nav class="navbar navbar-expand-lg navbar-dark " style="background-color: #2C75FE;">
+        <div class="container-fluid">
+            <div class="row" style="width: 100%;">
+                <div class="col-md-6">
+                    <a class="navbar-brand" href="#">จัดการร้านอาหาร</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="./home_admin.html">อาหาร</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="./payment.html">ชำระเงิน</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6" align="right">
+                    <button type="button" class="btn btn-danger btn-xs" @click="logout">ออกจากระบบ</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div  style="background-image: url('images/bg.jfif');background-position: center;background-repeat: no-repeat;background-size: cover;">
+        <div class="container-login100">
+            <div class="container">
+                <div class="in-card">
+                    <div class="container-fluid">
+                        <form class="d-flex">
+                            <input class="form-control me-2" v-model="search" type="search" placeholder="ค้นหาชื่ออาหาร" aria-label="Search">
+                        </form>
+                    </div>
+                    <hr>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="panel-title">
+                                <h3>ข้อมูลอาหาร</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-6" align="right">
+                            <input type="button" class="btn btn-success " data-bs-toggle="modal" data-bs-target="#myModal" @click="openModal" value="เพิ่มอาหาร">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div v-for="item in searchItems" class="col-md-3 col-6 my-1">
+                            <div class="card h-100">
+                                <img :src="item.img" v-if="item.img != null" class="card-img-top" style="height: 200px;">
+                                <img src="./images/no.png" v-else class="card-img-top" style="height: 200px;">
+                                <div class="card-body"  >
+                                    <h3 class="card-title">{{ item.food_name }}</h3>
+                                    <br>
+                                    <h5 class="card-title">{{ item.food_price | toThaibath }}</h5>
+                                </div>
+                                <div class="card-foot" style="padding-bottom: 10px;">
+                                    <div class="row">
+                                        <div class="col-sm-6" align="left">
+                                            <div style="padding-left: 20px;">
+                                                <button type="button" class="btn btn-warning" @click="edit_food(item.food_id)" data-bs-toggle="modal" data-bs-target="#myModal"><i class="fas fa-tools"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6" align="right">
+                                            <div style="padding-right: 20px;">
+                                                <button type="button" class="btn btn-danger" @click="delete_food(item.food_id)"><i class="fas fa-trash-alt"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal" id="myModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">{{ HeaderTitle }}</h4>
+                                <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-times"></i></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="name">ชื่อ</label>
+                                    <input type="text" v-model="food_name" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="food_price">ราคา</label>
+                                    <input type="number" v-model="food_price" min="0" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="seletedFile">รูปภาพ</label>
+                                    <img :src="imgPreview" v-if="imgPreview != null" id="preview" class="card-img-top" style="height: 100px;width: 100px;">
+                                    <img src="./images/no.png" v-else class="card-img-top" id="preview" style="height: 100px;width: 100px;">
+                                    <input type="file" id="file" name="file" v-on:change="seletedFile"  class="form-control">
+                                </div>
+                                <br>
+                                <div class="modal-footer">
+                                    <input type="button" v-model="actionButton" @click="submitData" class="btn btn-success btn-xs" value="add">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>	
+</div>
+	<script src="https://code.iconify.design/1/1.0.7/iconify.min.js"></script>
+	<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
+	<script src="vendor/animsition/js/animsition.min.js"></script>
+	<script src="vendor/bootstrap/js/popper.js"></script>
+	<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+	<script src="vendor/select2/select2.min.js"></script>
+	<script src="vendor/daterangepicker/moment.min.js"></script>
+	<script src="vendor/daterangepicker/daterangepicker.js"></script>
+	<script src="vendor/countdowntime/countdowntime.js"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="./node_modules/toastr/build/toastr.min.js"></script>
+	<script src="js/main.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.2/firebase-storage.js"></script>
+    <script>
+        var firebaseConfig = {
+                apiKey: "AIzaSyC-8X-hm2X7AztdfycQ3qfpjwZDwVYIq8U",
+                authDomain: "food-6e72d.firebaseapp.com",
+                projectId: "food-6e72d",
+                storageBucket: "food-6e72d.appspot.com",
+                messagingSenderId: "248724393038",
+                appId: "1:248724393038:web:77bca089e2f714ee2e871f"
+        }
+            firebase.initializeApp(firebaseConfig)
+    </script>
+
+    <script>
+        var app = new Vue({
+            el:"#home",
+            data:{
+				food_name:'',
+                food_price:'',
+                img:null,
+                imgPreview:null,
+				hiddenId:null,
+                actionButton:'add',
+                HeaderTitle:'เพิ่มข้อมูลอาหาร',
+                ev:null,
+                search:'',
+				items: []
+            },
+            methods:{
+				food_all(){
+					endpoint.get('/food-all')
+					.then( function (res) {
+						if(res.data.statusCode == 200){
+							app.items = res.data.data
+						}else{
+							toastr.error('เชื่อมต่ออาจมีปัญหา','เกิดข้อผิดพลาด',{timeOut: 3000})
+						}
+					}).catch(function (error) {
+						console.log(error)
+					})
+				},submitData(){
+                    if(app.food_name == '' || app.food_price == ''){
+                        toastr.error('โปรดกรอกข้อมูลให้ครบ','เกิดข้อผิดพลาด',{timeOut: 3000})
+                        return
+                    }
+                        if(app.img != null ){
+                            var storageRef = firebase.storage().ref()
+                            var name = new Date()+'-'+app.img.name
+                            var metaData = {contentType:app.img.type}
+                            storageRef.child(name).put(app.img,metaData)
+                            .then((snapshot) => snapshot.ref.getDownloadURL())
+                            .then(url=>{
+                                endpoint.post('/food',{
+                                    food_name:app.food_name,
+                                    food_price:app.food_price,
+                                    img:url,
+                                    food_id:app.hiddenId
+                                })
+                                .then( function (res) {
+                                    if(res.data.statusCode == 200){
+                                        app.food_all()
+                                        toastr.success('ดำเนินการสำเร็จ','',{timeOut: 3000})
+                                    }else{
+                                        toastr.error('เชื่อมต่ออาจมีปัญหา','เกิดข้อผิดพลาด',{timeOut: 3000})
+                                    }
+                                    app.food_name = ''
+                                    app.food_price = ''
+                                    app.img = null
+                                }).catch(function (error) {
+                                    console.log(error)
+                                })
+                            }) 
+                        }else{
+                                endpoint.post('/food',{
+                                    food_name:app.food_name,
+                                    food_price:app.food_price,
+                                    img:app.imgPreview,
+                                    food_id:app.hiddenId
+                                })
+                                .then( function (res) {
+                                    if(res.data.statusCode == 200){
+                                        app.food_all()
+                                        toastr.success('ดำเนินการสำเร็จ','',{timeOut: 3000})
+                                    }else{
+                                        toastr.error('เชื่อมต่ออาจมีปัญหา','เกิดข้อผิดพลาด',{timeOut: 3000})
+                                    }
+                                    app.food_name = ''
+                                    app.food_price = ''
+                                    app.img = null
+                                }).catch(function (error) {
+                                    console.log(error)
+                                })
+                        }
+                    $('#myModal').modal('hide')
+				},openModal(){
+                    app.food_name = ''
+                    app.food_price = ''
+                    app.img = null
+                    app.hiddenId = null
+                    app.actionButton = 'add'
+                    app.HeaderTitle = 'เพิ่มข้อมูลอาหาร'
+                    app.imgPreview = null
+                    if(app.ev != null)
+                        app.ev.target.value = ''
+                },seletedFile(e){
+                    app.img = e.target.files[0]
+                    let fileReader = new FileReader()
+                    fileReader.onload = function(event){
+                         app.imgPreview = event.target.result
+                    }
+                    fileReader.readAsDataURL(app.img)
+                    app.ev = e
+                    
+                },delete_food(id){
+                    if (confirm("ยืนยันการลบ") == false)
+                        return 
+                    endpoint.post('/food-delete',{
+                        food_id:id
+                    })
+                    .then( function (res) {
+                        if(res.data.statusCode == 200){
+                            app.food_all()
+                            toastr.success('ลบข้อมูลเรียบร้อย','ดำเนินการสำเร็จ',{timeOut: 3000})
+                        }else{
+                            toastr.error('เชื่อมต่ออาจมีปัญหา','เกิดข้อผิดพลาด',{timeOut: 3000})
+                        }
+                    }).catch(function (error) {
+                        console.log(error)
+                    })
+
+                },edit_food(id){
+                    app.actionButton = 'save'
+                    app.HeaderTitle = 'แก้ไขข้อมูลอาหาร'
+                    app.items.forEach(x=>{
+                        if(x.food_id == id){
+                            app.food_name = x.food_name
+                            app.food_price = x.food_price
+                            app.hiddenId = x.food_id
+                            if(app.ev != null)
+                                app.ev.target.value = ''
+
+                            if(x.img == null)
+                                app.imgPreview = null
+                            else
+                                app.imgPreview = x.img 
+                        }
+                    })
+               },logout(){
+                   sessionStorage.clear()
+                   window.location.href = './index.html'
+               }
+            },
+			filters: {
+				toThaibath (value) {
+				return `฿ ${value.toLocaleString()}`
+				}
+			},
+			created(){
+				this.food_all()
+			},
+			computed:{
+				searchItems:function(){
+					return this.items.filter((name)=>{
+						return name.food_name.match(app.search)
+					})
+				}
+			}
+        })
+    </script>
+</body>
+</html>
