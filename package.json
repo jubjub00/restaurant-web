@@ -2,9 +2,9 @@
   "name": "restaurant-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.html",
+  "main": "app.js",
   "scripts": {
-    "start": "index.html",
+    "start": "node js/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -12,7 +12,7 @@
   "dependencies": {
     "aws-sdk": "^2.892.0",
     "express": "^4.17.1",
-    "npm":"6.14.8",
-    "node":"14.15.1"
+    "node": "14.15.1",
+    "npm": "6.14.8"
   }
 }
